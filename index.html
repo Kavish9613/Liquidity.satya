@@ -3,200 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>liquidity.satya — Smart Money Concepts, Untangled</title>
+<title>Field Notes — a simple journal</title>
+<meta name="description" content="A simple personal notes and blog page.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ---------- Design tokens ---------- */
+  :root{
+    --bg:        #12221D;   /* deep forest ink, page background */
+    --bg-alt:    #182D26;   /* slightly lighter panel background */
+    --paper:     #ECE6D6;   /* warm parchment — main text colour */
+    --muted:     #93A99C;   /* muted sage — secondary text */
+    --accent:    #D9A441;   /* mustard — marks, headings accent */
+    --link:      #E4886A;   /* soft coral — links */
+    --rule:      #2E4239;   /* hairline rule colour */
+
+    --display:   'Fraunces', Georgia, serif;
+    --body:      'Source Serif 4', Georgia, serif;
+    --mono:      'IBM Plex Mono', Menlo, monospace;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--paper);
+    font-family:var(--body);
+    font-size:18px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:var(--link); text-decoration-thickness:1px; text-underline-offset:3px; }
+  a:hover{ color:var(--accent); }
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+  }
+
+  /* ---------- Layout shell ---------- */
+  .page{
+    display:grid;
+    grid-template-columns: 64px minmax(0,720px);
+    justify-content:center;
+    gap:0 32px;
+    max-width:1000px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ---------- Header ---------- */
+  header.hero{
+    grid-column:1 / -1;
+    padding:88px 0 56px;
+    border-bottom:1px solid var(--rule);
+  }
+  header.hero .eyebrow{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 18px;
+  }
+  header.hero h1{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(40px, 6vw, 64px);
+    line-height:1.05;
+    margin:0 0 20px;
+    max-width:14ch;
+  }
+  header.hero p.lede{
+    font-size:20px;
+    color:var(--muted);
+    max-width:52ch;
+    margin:0 0 28px;
+  }
+  nav.top a{
+    font-family:var(--mono);
+    font-size:14px;
+    color:var(--paper);
+    margin-right:22px;
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+  }
+  nav.top a:hover{ color:var(--accent); border-color:var(--accent); }
+
+  /* ---------- The spine: a vertical timeline of entry dates ----------
+     This is the page's signature element — a book-spine index down the
+     left margin. Each tick corresponds to a post; click to jump there. */
+  .spine{
+    position:relative;
+    padding-top:64px;
+  }
+  .spine::before{
+    content:"";
+    position:absolute;
+    top:64px; bottom:24px; left:31px;
+    width:1px;
+    background:var(--rule);
+  }
+  .spine a{
+    position:sticky;
+    top:24px;
+    display:block;
+    width:64px;
+    height:64px;
+    margin-bottom:220px;
+    text-decoration:none;
+  }
+  .spine a .tick{
+    position:relative;
+    left:27px;
+    top:24px;
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--bg);
+    border:1px solid var(--muted);
+    display:block;
+  }
+  .spine a:hover .tick, .spine a:focus-visible .tick{
+    background:var(--accent);
+    border-color:var(--accent);
+  }
+  .spine a .date{
+    position:absolute;
+    left:-4px;
+    top:38px;
+    width:78px;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--muted);
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+  }
+
+  /* ---------- Main column ---------- */
+  main{ padding:64px 0 40px; min-width:0; }
+
+  section.about{
+    padding-bottom:56px;
+    margin-bottom:56px;
+    border-bottom:1px solid var(--rule);
+  }
+  section.about h2{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:26px;
+    margin:0 0 14px;
+  }
+  section.about p{ color:var(--paper); max-width:60ch; }
+  section.about .tags{
+    margin-top:20px;
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--muted);
+  }
+  section.about .tags span{
+    display:inline-block;
+    border:1px solid var(--rule);
+    border-radius:3px;
+    padding:3px 9px;
+    margin:0 8px 8px 0;
+  }
+
+  article.entry{
+    padding-bottom:56px;
+    margin-bottom:56px;
+    border-bottom:1px solid var(--rule);
+    scroll-margin-top:24px;
+  }
+  article.entry:last-child{ border-bottom:none; }
+  article.entry .meta{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--accent);
+    margin:0 0 10px;
+    letter-spacing:.02em;
+  }
+  article.entry h3{
+    font-family:var(--display);
+    font-weight:600;
+    font-style:italic;
+    font-size:30px;
+    margin:0 0 16px;
+    line-height:1.15;
+  }
+  article.entry p{ margin:0 0 16px; max-width:60ch; }
+  article.entry p:last-child{ margin-bottom:0; }
+
+  /* ---------- Footer ---------- */
+  footer{
+    grid-column:1 / -1;
+    border-top:1px solid var(--rule);
+    padding:32px 0 64px;
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  footer a{ color:var(--muted); }
+  footer a:hover{ color:var(--accent); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 720px){
+    .page{ grid-template-columns: 1fr; padding:0 20px; }
+    .spine{ display:none; }
+    header.hero{ padding:56px 0 40px; }
+    main{ padding:40px 0 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+  }
+</style>
 </head>
 <body>
 
-<div class="noise-overlay"></div>
+<div class="page">
 
-<!-- NAV -->
-<header class="nav">
-  <div class="nav-inner">
-    <div class="brand">
-      <span class="brand-mark">liquidity<span class="brand-dot">.</span>satya</span>
-    </div>
-    <nav class="nav-links">
-      <a href="#curriculum">Curriculum</a>
-      <a href="#uploads">Uploads</a>
-      <a href="#desk">Trading Desk</a>
-      <a href="#join">Join</a>
+  <header class="hero">
+    <p class="eyebrow">Field Notes · a personal journal</p>
+    <h1>Notes on things worth<br>paying attention to.</h1>
+    <p class="lede">
+      Hi, I'm <strong>Your Name</strong> — this is a small page where I write
+      about what I'm building, reading, and figuring out. Edit this line to
+      introduce yourself.
+    </p>
+    <nav class="top">
+      <a href="#about">About</a>
+      <a href="#entry-3">Latest</a>
+      <a href="mailto:you@example.com">Contact</a>
     </nav>
-    <a href="#join" class="nav-cta">Subscribe</a>
-  </div>
-</header>
+  </header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-grid">
-    <div class="hero-copy">
-      <p class="eyebrow"><span class="eyebrow-dot"></span> Live on YouTube every week</p>
-      <h1>Smart Money leaves footprints.<br> Satya teaches you to <span class="ital">read</span> them.</h1>
-      <p class="hero-sub">
-        Order blocks. Fair value gaps. Liquidity sweeps. BOS &amp; CHoCH.
-        No signals, no hype — just structure, taught candle by candle
-        until it clicks.
+  <!-- Spine: one <a> per entry below, kept in the same order -->
+  <aside class="spine" aria-hidden="true">
+    <a href="#about"><span class="tick"></span><span class="date">Start</span></a>
+    <a href="#entry-1"><span class="tick"></span><span class="date">Jan 2026</span></a>
+    <a href="#entry-2"><span class="tick"></span><span class="date">Mar 2026</span></a>
+    <a href="#entry-3"><span class="tick"></span><span class="date">Jun 2026</span></a>
+  </aside>
+
+  <main>
+
+    <section class="about" id="about">
+      <h2>About</h2>
+      <p>
+        Replace this paragraph with a short bio: who you are, what you work
+        on, and why this page exists. Two or three sentences is plenty —
+        people are here to read your notes, not your résumé.
       </p>
-      <div class="hero-actions">
-        <a href="#join" class="btn btn-primary">Watch the free playlist</a>
-        <a href="#curriculum" class="btn btn-ghost">See the curriculum ↓</a>
+      <div class="tags">
+        <span>writing</span><span>notes</span><span>learning in public</span>
       </div>
-      <div class="hero-stats">
-        <div class="stat"><span class="stat-num">148K</span><span class="stat-label">subscribers</span></div>
-        <div class="stat-sep"></div>
-        <div class="stat"><span class="stat-num">312</span><span class="stat-label">lessons uploaded</span></div>
-        <div class="stat-sep"></div>
-        <div class="stat"><span class="stat-num">6</span><span class="stat-label">years chart time</span></div>
-      </div>
-    </div>
+    </section>
 
-    <div class="hero-chart-wrap">
-      <div class="chart-card">
-        <div class="chart-card-head">
-          <span class="pair">XAUUSD · 15m</span>
-          <span class="chart-live"><i></i>replaying</span>
-        </div>
-        <svg id="smc-chart" viewBox="0 0 640 420" xmlns="http://www.w3.org/2000/svg"></svg>
-        <div class="chart-caption" id="chart-caption">watching for buy-side liquidity…</div>
-      </div>
-    </div>
-  </div>
-</section>
+    <article class="entry" id="entry-1">
+      <p class="meta">01 — January 2026</p>
+      <h3>The first entry is always the hardest</h3>
+      <p>
+        This is placeholder text for your first post. Swap it out for
+        whatever you actually want to write about — a project update, a
+        thing you learned, or a link you want to remember. Keep paragraphs
+        short; it reads better on a page like this.
+      </p>
+      <p>
+        You can add as many paragraphs as you like inside this
+        <code>&lt;article&gt;</code> block.
+      </p>
+    </article>
 
-<!-- MARQUEE -->
-<div class="marquee">
-  <div class="marquee-track">
-    <span>ORDER BLOCKS</span><span>FAIR VALUE GAPS</span><span>LIQUIDITY SWEEPS</span><span>BOS</span><span>CHoCH</span><span>PREMIUM &amp; DISCOUNT</span><span>MITIGATION</span><span>INDUCEMENT</span>
-    <span>ORDER BLOCKS</span><span>FAIR VALUE GAPS</span><span>LIQUIDITY SWEEPS</span><span>BOS</span><span>CHoCH</span><span>PREMIUM &amp; DISCOUNT</span><span>MITIGATION</span><span>INDUCEMENT</span>
-  </div>
+    <article class="entry" id="entry-2">
+      <p class="meta">02 — March 2026</p>
+      <h3>A second note, a few months later</h3>
+      <p>
+        Duplicate the <code>&lt;article class="entry"&gt;</code> block to add
+        a new post, give it a new <code>id</code>, and add a matching tick
+        mark in the spine on the left so it stays linked to the timeline.
+      </p>
+    </article>
+
+    <article class="entry" id="entry-3">
+      <p class="meta">03 — June 2026</p>
+      <h3>Whatever you're thinking about right now</h3>
+      <p>
+        This last entry is a good spot for your most recent post — the
+        "Latest" link in the top navigation jumps straight here.
+      </p>
+    </article>
+
+  </main>
+
+  <footer>
+    <span>&copy; 2026 Your Name. Built with plain HTML &amp; CSS.</span>
+    <span><a href="https://github.com/">GitHub</a> · <a href="mailto:you@example.com">Email</a></span>
+  </footer>
+
 </div>
 
-<!-- CURRICULUM -->
-<section class="curriculum" id="curriculum">
-  <div class="section-head">
-    <p class="section-kicker">The Curriculum</p>
-    <h2>Six concepts. Taught in order, because order matters.</h2>
-    <p class="section-sub">Structure, liquidity, and the smart money footprint — taught in order, from the basics to the parts most channels skip.</p>
-  </div>
-
-  <div class="concept-grid">
-    <article class="concept-card">
-      <div class="concept-index">M1 · Foundation</div>
-      <h3>Structure Mapping — Basics</h3>
-      <p>How to mark swing highs and lows without lying to yourself: HH, HL, LH, LL, and the first clean Break of Structure.</p>
-    </article>
-    <article class="concept-card">
-      <div class="concept-index">M2 · Foundation</div>
-      <h3>Structure Mapping — Advanced</h3>
-      <p>Internal vs external structure, multi-timeframe mapping, and reading CHoCH before the crowd catches on.</p>
-    </article>
-    <article class="concept-card">
-      <div class="concept-index">M3 · Liquidity</div>
-      <h3>Liquidity — The Basics</h3>
-      <p>Where retail stops actually sit, why price is drawn to them, and how to spot a pool before it gets swept.</p>
-    </article>
-    <article class="concept-card">
-      <div class="concept-index">M4 · Liquidity</div>
-      <h3>Advanced Liquidity Concepts</h3>
-      <p>Inducement, liquidity voids, engineered liquidity, and stacking sweeps across sessions and timeframes.</p>
-    </article>
-    <article class="concept-card">
-      <div class="concept-index">M5 · Footprint</div>
-      <h3>Smart Money Footprint</h3>
-      <p>Reading order blocks, mitigation, and imbalance together — the actual footprint smart money leaves behind on a chart.</p>
-    </article>
-  </div>
-</section>
-
-<!-- UPLOADS -->
-<section class="uploads" id="uploads">
-  <div class="section-head">
-    <p class="section-kicker">Latest Uploads</p>
-    <h2>Fresh charts, posted weekly.</h2>
-  </div>
-
-  <div class="video-grid">
-    <a class="video-card" href="#">
-      <div class="video-thumb">
-        <svg class="thumb-mini" viewBox="0 0 300 160"><polyline points="10,120 40,100 70,110 100,60 130,80 160,40 190,55 220,30 250,45 290,20" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-        <span class="video-duration">18:42</span>
-        <span class="play-ring">▶</span>
-      </div>
-      <div class="video-meta">
-        <h4>The liquidity sweep nobody warns you about</h4>
-        <p>212K views · 2 weeks ago</p>
-      </div>
-    </a>
-    <a class="video-card" href="#">
-      <div class="video-thumb">
-        <svg class="thumb-mini" viewBox="0 0 300 160"><polyline points="10,40 40,60 70,45 100,90 130,70 160,110 190,95 220,130 250,115 290,140" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-        <span class="video-duration">24:05</span>
-        <span class="play-ring">▶</span>
-      </div>
-      <div class="video-meta">
-        <h4>Order blocks vs supply/demand — the real difference</h4>
-        <p>184K views · 3 weeks ago</p>
-      </div>
-    </a>
-    <a class="video-card" href="#">
-      <div class="video-thumb">
-        <svg class="thumb-mini" viewBox="0 0 300 160"><polyline points="10,100 40,90 70,120 100,70 130,85 160,50 190,65 220,35 250,55 290,25" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-        <span class="video-duration">15:30</span>
-        <span class="play-ring">▶</span>
-      </div>
-      <div class="video-meta">
-        <h4>CHoCH on gold: a full breakdown, live</h4>
-        <p>296K views · 1 month ago</p>
-      </div>
-    </a>
-  </div>
-</section>
-
-<!-- TRADING DESK / PHILOSOPHY -->
-<section class="desk" id="desk">
-  <div class="desk-inner">
-    <div class="desk-copy">
-      <p class="section-kicker">Why This Channel</p>
-      <h2>Not another "SMC guru."</h2>
-      <p>
-        Satya started posting chart breakdowns after losing a year's savings
-        chasing signal groups. liquidity.satya exists so nobody has to
-        pay to learn what a liquidity sweep actually is. Every video
-        is a real chart, marked in real time, mistakes included.
-      </p>
-      <ul class="desk-list">
-        <li><span>01</span>No paid signals, no mentorship upsell</li>
-        <li><span>02</span>Every setup shown before and after it plays out</li>
-        <li><span>03</span>Weekly livestream Q&amp;A on unmarked charts</li>
-      </ul>
-    </div>
-    <div class="desk-quote">
-      <p>"Liquidity doesn't lie. Your bias does."</p>
-      <span>— Satya, Episode 1</span>
-    </div>
-  </div>
-</section>
-
-<!-- JOIN / CTA -->
-<section class="join" id="join">
-  <h2>Stop guessing where price goes next.</h2>
-  <p>New SMC breakdown every Tuesday. Free, forever.</p>
-  <div class="join-actions">
-    <a href="#" class="btn btn-primary btn-large">Subscribe on YouTube</a>
-  </div>
-  <div class="join-socials">
-    <a href="#">Instagram</a>
-    <a href="#">Telegram</a>
-    <a href="#">X / Twitter</a>
-  </div>
-</section>
-
-<footer class="footer">
-  <span>© 2026 liquidity.satya — for education only. Not financial advice.</span>
-</footer>
-
-<script src="script.js"></script>
 </body>
 </html>
